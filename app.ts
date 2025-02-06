@@ -1,12 +1,7 @@
-// interfaces
-interface IEvent {
-  type(): string;
-  machineId(): string;
-}
-
-interface ISubscriber {
-  handle(event: IEvent): void;
-}
+import { MachineStorage } from './machine';
+import { MachineRefillSubscriber } from './refillEvent';
+import { MachineSaleSubscriber } from './saleEvent';
+import { IEvent, ISubscriber } from './utils';
 
 interface IPublishSubscribeService {
   publish (event: IEvent): void;
@@ -15,102 +10,45 @@ interface IPublishSubscribeService {
 }
 
 
-// implementations
-class MachineSaleEvent implements IEvent {
-  constructor(private readonly _sold: number, private readonly _machineId: string) {}
-
-  machineId(): string {
-    return this._machineId;
-  }
-
-  getSoldQuantity(): number {
-    return this._sold
-  }
-
-  type(): string {
-    return 'sale';
-  }
-}
-
-class MachineRefillEvent implements IEvent {
-  constructor(private readonly _refill: number, private readonly _machineId: string) {}
-
-  machineId(): string {
-    throw new Error("Method not implemented.");
-  }
-
-  type(): string {
-    throw new Error("Method not implemented.");
-  }
-}
-
-class MachineSaleSubscriber implements ISubscriber {
-  public machines: Machine[];
-
-  constructor (machines: Machine[]) {
-    this.machines = machines; 
-  }
-
-  handle(event: MachineSaleEvent): void {
-    this.machines[2].stockLevel -= event.getSoldQuantity();
-  }
-}
-
-class MachineRefillSubscriber implements ISubscriber {
-  handle(event: IEvent): void {
-    throw new Error("Method not implemented.");
-  }
-}
-
-
-// objects
-class Machine {
-  public stockLevel = 10;
-  public id: string;
-
-  constructor (id: string) {
-    this.id = id;
-  }
-}
-
-
-// helpers
-const randomMachine = (): string => {
-  const random = Math.random() * 3;
-  if (random < 1) {
-    return '001';
-  } else if (random < 2) {
-    return '002';
-  }
-  return '003';
-
-}
-
-const eventGenerator = (): IEvent => {
-  const random = Math.random();
-  if (random < 0.5) {
-    const saleQty = Math.random() < 0.5 ? 1 : 2; // 1 or 2
-    return new MachineSaleEvent(saleQty, randomMachine());
-  } 
-  const refillQty = Math.random() < 0.5 ? 3 : 5; // 3 or 5
-  return new MachineRefillEvent(refillQty, randomMachine());
-}
-
 
 // program
 (async () => {
   // create 3 machines with a quantity of 10 stock
-  const machines: Machine[] = [ new Machine('001'), new Machine('002'), new Machine('003') ];
+  // const machines: Machine[] = [ new Machine('001'), new Machine('002'), new Machine('003') ];
+
+  // console.log(machines);
+
+  const machines: MachineStorage = new MachineStorage()
+  machines.initMachine()
+
+  /*
+  const randEvent: MachineSaleEvent = new MachineSaleEvent(1, '001');
+  const saleSubscriber = new MachineSaleSubscriber(machines);
+  saleSubscriber.handle(randEvent)
+  */
 
   // create a machine sale event subscriber. inject the machines (all subscribers should do this)
   const saleSubscriber = new MachineSaleSubscriber(machines);
+  const refillSubscriber = new MachineRefillSubscriber(machines);
+
+  // const exampleSaleEvent = new MachineSaleEvent(1, '001');
+  // const exampleRefillEvent = new MachineRefillEvent(3, '001');
+
+  // console.log(exampleSaleEvent.machineId());
+  // console.log(exampleSaleEvent.getSoldQuantity());
+  // console.log(exampleSaleEvent.type());
+
+  // console.log(machines);
 
   // create the PubSub service
-  const pubSubService: IPublishSubscribeService = null as unknown as IPublishSubscribeService; // implement and fix this
+  // const pubSubService: IPublishSubscribeService = null as unknown as IPublishSubscribeService; // implement and fix this
 
   // create 5 random events
-  const events = [1,2,3,4,5].map(i => eventGenerator());
+  // const events = [1,2,3,4,5].map(i => eventGenerator());
+  // console.log(events);
 
+
+  // subscribe the sale subscriber to the sale event
   // publish the events
-  events.map(pubSubService.publish);
+  // events.map(pubSubService.publish);
 })();
