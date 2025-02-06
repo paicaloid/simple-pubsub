@@ -1,4 +1,4 @@
-import { MachineStorage } from './machine';
+import { MachineStorage, eventGenerator } from './machine';
 import { MachineRefillSubscriber } from './refillEvent';
 import { MachineSaleSubscriber } from './saleEvent';
 import { IEvent, ISubscriber } from './utils';
@@ -9,6 +9,28 @@ interface IPublishSubscribeService {
   // unsubscribe ( /* Question 2 - build this feature */ );
 }
 
+
+class PublishSubscribeService implements IPublishSubscribeService {
+  private subscribers: { [key: string]: ISubscriber[] } = {};
+
+  subscribe (type: string, handler: ISubscriber): void {
+    if (this.subscribers[type] === undefined){
+      this.subscribers[type] = []
+    }
+    this.subscribers[type].push(handler)
+  }
+
+  publish (event: IEvent): void {
+    const eventType = event.type();
+    console.log(event)
+    console.log(eventType)
+    // console.log(this.subscribers)
+    if (this.subscribers[eventType]) {
+      this.subscribers[eventType].forEach(subscriber => subscriber.handle(event));
+    }
+  }
+
+}
 
 
 // program
@@ -31,8 +53,14 @@ interface IPublishSubscribeService {
   const saleSubscriber = new MachineSaleSubscriber(machines);
   const refillSubscriber = new MachineRefillSubscriber(machines);
 
+  const pubSubService = new PublishSubscribeService();
+  pubSubService.subscribe('sale', saleSubscriber);
+  pubSubService.subscribe('refill', refillSubscriber);
+
+
   // const exampleSaleEvent = new MachineSaleEvent(1, '001');
   // const exampleRefillEvent = new MachineRefillEvent(3, '001');
+  // pubSubService.publish(exampleSaleEvent)
 
   // console.log(exampleSaleEvent.machineId());
   // console.log(exampleSaleEvent.getSoldQuantity());
@@ -44,11 +72,15 @@ interface IPublishSubscribeService {
   // const pubSubService: IPublishSubscribeService = null as unknown as IPublishSubscribeService; // implement and fix this
 
   // create 5 random events
-  // const events = [1,2,3,4,5].map(i => eventGenerator());
-  // console.log(events);
+  const events = [1,2,3,4,5].map(i => eventGenerator());
+  console.log(events);
 
 
   // subscribe the sale subscriber to the sale event
   // publish the events
-  // events.map(pubSubService.publish);
+  events.forEach(event => pubSubService.publish(event));
+
+  console.log(machines.getAll())
+
+
 })();
