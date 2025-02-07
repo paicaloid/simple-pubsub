@@ -29,7 +29,7 @@ class MachineRefillSubscriber implements ISubscriber {
 	handle(event: MachineRefillEvent): void {
 		const machine = this.machines.getById(event.machineId())
 		if (machine) {
-		machine.stockLevel += event.getSoldQuantity();
+			this.machines.adjustStock(machine, event.getSoldQuantity())
 		}
 		// this.machines[2].stockLevel += event.getSoldQuantity();
 	}

@@ -1,9 +1,11 @@
 import { MachineRefillEvent } from './refillEvent';
 import { MachineSaleEvent } from './saleEvent';
 import { IEvent } from './utils';
+
 // objects
 class Machine {
 	public stockLevel = 10;
+	public needRefill: boolean = false;
 	public id: string;
 
 	constructor(id: string) {
@@ -28,6 +30,13 @@ class MachineStorage {
 	getById(id: string): Machine | undefined {
 		return this.machine.find(machine => machine.id === id)
 	}
+
+	// prevent stockLevel less than zero
+	adjustStock(machine: Machine, quantity: number): void {
+		if (machine) {
+			machine.stockLevel = Math.max(machine.stockLevel - quantity, 0);
+		}
+	}
 }
 
 // helpers
@@ -44,7 +53,7 @@ const randomMachine = (): string => {
 
 const eventGenerator = (): IEvent => {
 	const random = Math.random();
-	if (random < 0.5) {
+	if (random < 0.9) {
 		const saleQty = Math.random() < 0.5 ? 1 : 2; // 1 or 2
 		return new MachineSaleEvent(saleQty, randomMachine());
 	}
@@ -52,5 +61,11 @@ const eventGenerator = (): IEvent => {
 	return new MachineRefillEvent(refillQty, randomMachine());
 }
 
-export { eventGenerator, Machine, MachineStorage, randomMachine };
+const stockWarningGenerator = (machines: MachineStorage): void => {
+	const machine = machines.getAll()
+	machine.forEach(m => console.log(m))
+}
+
+
+export { eventGenerator, Machine, MachineStorage, randomMachine, stockWarningGenerator };
 

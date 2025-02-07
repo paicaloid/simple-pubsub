@@ -29,9 +29,8 @@ class MachineSaleSubscriber implements ISubscriber {
   handle(event: MachineSaleEvent): void {
     const machine = this.machines.getById(event.machineId())
     if (machine) {
-      machine.stockLevel -= event.getSoldQuantity();
+      this.machines.adjustStock(machine, event.getSoldQuantity())
     }
-    // this.machines[2].stockLevel -= event.getSoldQuantity();
   }
 }
 
