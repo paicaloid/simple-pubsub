@@ -1,4 +1,4 @@
-import { MachineStorage, eventGenerator } from './machine';
+import { eventGenerator, MachineStorage } from './machine';
 import { MachineRefillSubscriber } from './refillEvent';
 import { MachineSaleSubscriber } from './saleEvent';
 import { IEvent, ISubscriber } from './utils';
@@ -40,7 +40,7 @@ class PublishSubscribeService implements IPublishSubscribeService {
 
 
 // program
-(async () => {
+(async (n: number) => {
   // create 3 machines with a quantity of 10 stock
   // const machines: Machine[] = [ new Machine('001'), new Machine('002'), new Machine('003') ];
 
@@ -77,21 +77,23 @@ class PublishSubscribeService implements IPublishSubscribeService {
   // create the PubSub service
   // const pubSubService: IPublishSubscribeService = null as unknown as IPublishSubscribeService; // implement and fix this
 
-  // create 5 random events
-  const events = [1,2,3,4,5].map(i => eventGenerator());
+  // create n random events
+  const events = Array.from({ length: n }, () => eventGenerator());
   console.log(events);
+
 
 
   // subscribe the sale subscriber to the sale event
   // publish the events
   events.forEach(event => pubSubService.publish(event));
 
+  // console.log(machines.getAll())
+  // stockWarningGenerator(machines)
+
+  // pubSubService.unsubscribe('sale')
+
+  // events.forEach(event => pubSubService.publish(event));
   console.log(machines.getAll())
 
-  pubSubService.unsubscribe('sale')
 
-  events.forEach(event => pubSubService.publish(event));
-  console.log(machines.getAll())
-
-
-})();
+})(30); // Pass the desired number of events here
