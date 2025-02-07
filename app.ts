@@ -7,8 +7,8 @@ interface IPublishSubscribeService {
   publish (event: IEvent): void;
   subscribe (type: string, handler: ISubscriber): void;
   // unsubscribe ( /* Question 2 - build this feature */ );
+  unsubscribe (type: string): void;
 }
-
 
 class PublishSubscribeService implements IPublishSubscribeService {
   private subscribers: { [key: string]: ISubscriber[] } = {};
@@ -22,11 +22,17 @@ class PublishSubscribeService implements IPublishSubscribeService {
 
   publish (event: IEvent): void {
     const eventType = event.type();
-    console.log(event)
-    console.log(eventType)
+    // console.log(event)
+    // console.log(eventType)
     // console.log(this.subscribers)
     if (this.subscribers[eventType]) {
       this.subscribers[eventType].forEach(subscriber => subscriber.handle(event));
+    }
+  }
+
+  unsubscribe (type: string): void {
+    if (this.subscribers[type]){
+      this.subscribers[type].pop()
     }
   }
 
@@ -80,6 +86,11 @@ class PublishSubscribeService implements IPublishSubscribeService {
   // publish the events
   events.forEach(event => pubSubService.publish(event));
 
+  console.log(machines.getAll())
+
+  pubSubService.unsubscribe('sale')
+
+  events.forEach(event => pubSubService.publish(event));
   console.log(machines.getAll())
 
 
