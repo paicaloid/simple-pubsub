@@ -13,7 +13,11 @@ class Machine {
 	}
 }
 
-
+/**
+MachineStorage class
+- store all machines
+- provide methods to get machine by id, increase/decrease stock, enable/disable refill
+ */
 class MachineStorage {
 	private machine: Machine[] = [];
 
@@ -74,6 +78,7 @@ const randomMachine = (): string => {
 
 const eventGenerator = (): IEvent => {
 	const random = Math.random();
+	// change from 0.5 to 0.8 for more sale events to test stock level
 	if (random < 0.8) {
 		const saleQty = Math.random() < 0.5 ? 1 : 2; // 1 or 2
 		return new MachineSaleEvent(saleQty, randomMachine());

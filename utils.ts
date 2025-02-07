@@ -8,6 +8,10 @@ interface IEvent {
 
 interface ISubscriber {
 	// handle(event: IEvent): void;
+	/*
+	Change from void to WarningOptional
+	to allow the subscriber to return warnings
+	*/
 	handle(event: IEvent): WarningOptional;
 }
 

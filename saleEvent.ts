@@ -32,7 +32,9 @@ class MachineSaleSubscriber implements ISubscriber {
     if (machine) {
       this.machines.decreaseStock(machine, event.getSoldQuantity())
 
-      // Check LowStockWarningEvent
+      /*
+      Check if the stock level is below 3 and the machine does not need a refill
+      */
       if ((machine.stockLevel < 3) && (!machine.needRefill)) {
         return lowStockWarning(machine.id)
       }

@@ -15,6 +15,7 @@ interface IPublishSubscribeService {
 class PublishSubscribeService implements IPublishSubscribeService {
   private subscribers: { [key: string]: ISubscriber[] } = {};
 
+  // add a subscriber to the list
   subscribe(type: string, handler: ISubscriber): void {
     if (this.subscribers[type] === undefined) {
       this.subscribers[type] = []
@@ -26,12 +27,21 @@ class PublishSubscribeService implements IPublishSubscribeService {
     const eventType = event.type();
     if (this.subscribers[eventType]) {
       this.subscribers[eventType].map(subscriber => {
+        /*
+        results is the warning that the subscriber returns
+        - stockLevel < 3 and needRefill = false -> LowStockWarningEvent
+        - stockLevel > 3 and needRefill = true -> StockLevelOkEvent
+        - else -> NoWarningEvent
+        */
         const result: WarningOptional = subscriber.handle(event)
+
+        // if the subscriber returns a warning, publish it
         this.publish(result)
       });
     }
   }
 
+  // remove a subscriber from the list
   unsubscribe(type: string): void {
     if (this.subscribers[type]) {
       this.subscribers[type].pop()
@@ -40,13 +50,14 @@ class PublishSubscribeService implements IPublishSubscribeService {
 
 }
 
-
+// for testing
 const testSaleEvents: MachineSaleEvent[] = [
   new MachineSaleEvent(7, '001'),
   new MachineSaleEvent(1, '001'),
   new MachineSaleEvent(3, '001'),
 ];
 
+// for testing
 const testRefillEvents: MachineRefillEvent[] = [
   new MachineRefillEvent(2, '001'),
   new MachineRefillEvent(1, '001'),
@@ -56,8 +67,7 @@ const testRefillEvents: MachineRefillEvent[] = [
 
 // program
 (async (n: number) => {
-  // const machines: Machine[] = [ new Machine('001'), new Machine('002'), new Machine('003') ];
-  // create 3 machines with a quantity of 10 stock
+  // create 3 machines with a quantity of 10 stock (initMachine)
   const machines: MachineStorage = new MachineStorage()
   machines.initMachine()
 
@@ -72,25 +82,8 @@ const testRefillEvents: MachineRefillEvent[] = [
   pubSubService.subscribe('refill', refillSubscriber);
   pubSubService.subscribe('warning', warningSubscriber);
 
-  // test LowStockWarningEvent
-
-  // console.log(testWarningEvent)
-
-  // testSaleEvents.forEach(event => {
-  //   console.log(event)
-  //   pubSubService.publish(event)
-  // });
-
-  // testRefillEvents.forEach(event => {
-  //   console.log(event)
-  //   pubSubService.publish(event)
-  // });
-
-  // console.log(machines.getAll())
-
   // create n random events
   const events = Array.from({ length: n }, () => eventGenerator());
-  // console.log(events);
 
   // publish the events
   events.forEach(event => {

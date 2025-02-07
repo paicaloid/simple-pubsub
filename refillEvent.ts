@@ -32,10 +32,12 @@ class MachineRefillSubscriber implements ISubscriber {
 		if (machine) {
 			this.machines.increaseStock(machine, event.getSoldQuantity())
 
-			// Check StockLevelOkEvent
+			/*
+			Check if the stock level is above 3 and the machine needs a refill
+			*/
 			if ((machine.stockLevel > 3) && (machine.needRefill)) {
-        return stockLevelOk(machine.id)
-      }
+				return stockLevelOk(machine.id)
+			}
 			else {
 				return noWarning(machine.id)
 			}
