@@ -1,4 +1,5 @@
 import { MachineStorage } from './machine';
+import { WarningOptional, noWarning, stockLevelOk } from './stockEvent';
 import { IEvent, ISubscriber } from './utils';
 
 class MachineRefillEvent implements IEvent {
@@ -26,12 +27,20 @@ class MachineRefillSubscriber implements ISubscriber {
 		this.machines = machines;
 	}
 
-	handle(event: MachineRefillEvent): void {
+	handle(event: MachineRefillEvent): WarningOptional {
 		const machine = this.machines.getById(event.machineId())
 		if (machine) {
-			this.machines.adjustStock(machine, event.getSoldQuantity())
+			this.machines.increaseStock(machine, event.getSoldQuantity())
+
+			// Check StockLevelOkEvent
+			if ((machine.stockLevel > 3) && (machine.needRefill)) {
+        return stockLevelOk(machine.id)
+      }
+			else {
+				return noWarning(machine.id)
+			}
 		}
-		// this.machines[2].stockLevel += event.getSoldQuantity();
+
 	}
 }
 

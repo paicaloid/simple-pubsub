@@ -1,3 +1,5 @@
+import { WarningOptional } from "./stockEvent";
+
 // interfaces
 interface IEvent {
 	type(): string;
@@ -5,7 +7,8 @@ interface IEvent {
 }
 
 interface ISubscriber {
-	handle(event: IEvent): void;
+	// handle(event: IEvent): void;
+	handle(event: IEvent): WarningOptional;
 }
 
 export { IEvent, ISubscriber };

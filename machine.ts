@@ -23,6 +23,12 @@ class MachineStorage {
 		this.machine.push(new Machine('003'))
 	}
 
+	report(): void {
+		this.machine.forEach(m => {
+			console.log(`Machine ${m.id} has stock level ${m.stockLevel} and ${m.needRefill ? 'needs refill' : 'does not need refill'}`)
+		})
+	}
+
 	getAll(): Machine[] {
 		return this.machine
 	}
@@ -32,10 +38,25 @@ class MachineStorage {
 	}
 
 	// prevent stockLevel less than zero
-	adjustStock(machine: Machine, quantity: number): void {
+	decreaseStock(machine: Machine, quantity: number): void {
 		if (machine) {
 			machine.stockLevel = Math.max(machine.stockLevel - quantity, 0);
 		}
+	}
+
+	// prevent stockLevel more than ??
+	increaseStock(machine: Machine, quantity: number): void {
+		if (machine) {
+			machine.stockLevel += quantity;
+		}
+	}
+
+	enableRefill(machine: Machine): void {
+		machine.needRefill = true;
+	}
+
+	disableRefill(machine: Machine): void {
+		machine.needRefill = false;
 	}
 }
 
@@ -53,7 +74,7 @@ const randomMachine = (): string => {
 
 const eventGenerator = (): IEvent => {
 	const random = Math.random();
-	if (random < 0.9) {
+	if (random < 0.8) {
 		const saleQty = Math.random() < 0.5 ? 1 : 2; // 1 or 2
 		return new MachineSaleEvent(saleQty, randomMachine());
 	}
